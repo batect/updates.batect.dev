@@ -24,6 +24,9 @@ jobs:
       - name: Lint Terraform files
         run: ./batect lintTerraform
 
+      - name: Check code files have license header
+        run: ./batect checkLicenseHeader
+
       - name: Log in to GCP
         run: ./batect setupGCPServiceAccount
         if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/master' && github.event_name == 'push'

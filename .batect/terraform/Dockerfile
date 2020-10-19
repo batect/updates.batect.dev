@@ -4,6 +4,7 @@ RUN apk add --no-cache \
     bash \
     ca-certificates \
     curl \
+    ncurses \
     python3
 
 ARG TERRAFORM_VERSION=0.13.4

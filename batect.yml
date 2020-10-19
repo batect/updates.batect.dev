@@ -106,3 +106,10 @@ tasks:
       command: sh -c "observatory $DOMAIN --format report --zero --rescan && observatory $DOMAIN --format report --min-grade A+ --min-score 100"
       environment:
         DOMAIN: updates.batect.dev
+
+  checkLicenseHeader:
+    description: Check that all files have the required license header.
+    group: Linting tasks
+    run:
+      container: terraform
+      command: ./scripts/check_licenses.sh

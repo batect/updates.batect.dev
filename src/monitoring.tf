@@ -17,27 +17,11 @@
 // See both the License and the Condition for the specific language governing permissions and
 // limitations under the License and the Condition.
 
-locals {
-  # We can't look this up with a data resource without giving access to all zones in the Cloudflare account :sadface:
-  cloudflare_zone_id = "b285aeea52df6b888cdee6d2551ebd32"
-  domain_name        = "updates.batect.dev"
-}
+resource "google_monitoring_notification_channel" "email" {
+  display_name = "Email to alerts@batect.dev"
+  type         = "email"
 
-resource "cloudflare_worker_script" "rewrite" {
-  name    = "updates_rewrite"
-  content = file("worker.js")
-}
-
-resource "cloudflare_worker_route" "rewrite" {
-  zone_id     = local.cloudflare_zone_id
-  pattern     = "${local.domain_name}/*"
-  script_name = cloudflare_worker_script.rewrite.name
-}
-
-resource "cloudflare_record" "dns" {
-  name    = "updates"
-  type    = "A"
-  zone_id = local.cloudflare_zone_id
-  value   = "1.1.1.1" # Dummy value, never used.
-  proxied = true
+  labels = {
+    email_address = "alerts@batect.dev"
+  }
 }

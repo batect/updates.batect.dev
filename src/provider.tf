@@ -20,7 +20,7 @@ terraform {
 }
 
 provider "cloudflare" {
-  api_token = trimspace(file("${path.module}/../.creds/cloudflare_key"))
+  api_token  = trimspace(file("${path.module}/../.creds/cloudflare_key"))
   account_id = "4d106699f468851a1f005ce8ae96ba5a"
 }
 

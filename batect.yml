@@ -1,0 +1,87 @@
+containers:
+  terraform:
+    build_directory: .batect/terraform
+    volumes:
+      - local: .
+        container: /code
+        options: cached
+      - local: .gcloud
+        container: /root/.config/gcloud
+        options: cached
+    working_directory: /code
+    environment:
+      CLOUDSDK_ACTIVE_CONFIG_NAME: local
+      GOOGLE_PROJECT: batect-updates-prod
+      GOOGLE_ORGANIZATION: 31831307074
+
+tasks:
+  setupTerraform:
+    description: Initialise Terraform.
+    group: Infrastructure management tasks
+    run:
+      container: terraform
+      command: sh -c 'terraform init -input=false -reconfigure -backend-config="bucket=$GOOGLE_PROJECT-terraform-state" -backend-config="credentials=../.creds/gcp_service_account_${CLOUDSDK_ACTIVE_CONFIG_NAME}.json"'
+      working_directory: /code/src
+
+  applyTerraform:
+    description: Run Terraform to provision infrastructure.
+    group: Infrastructure management tasks
+    run:
+      container: terraform
+      command: terraform apply -input=false -auto-approve
+      working_directory: /code/src
+
+  planTerraform:
+    description: Plan changes required to bring infrastructure to desired state.
+    group: Infrastructure management tasks
+    run:
+      container: terraform
+      command: terraform plan -input=false
+      working_directory: /code/src
+
+  destroyTerraform:
+    description: Run Terraform to provision infrastructure.
+    group: Infrastructure management tasks
+    run:
+      container: terraform
+      command: terraform destroy -input=false -auto-approve
+      working_directory: /code/src
+
+  checkTerraformState:
+    description: Check that the infrastructure matches the desired state.
+    group: Infrastructure management tasks
+    run:
+      container: terraform
+      command: terraform plan -detailed-exitcode -input=false -lock=false
+      working_directory: /code/src
+
+  terraformShell:
+    description: Start a shell in the Terraform environment.
+    group: Infrastructure management tasks
+    run:
+      container: terraform
+      command: bash
+
+  setupGCPServiceAccount:
+    description: Store credentials used to access GCP when deploying the application.
+    group: Setup tasks
+    run:
+      container: terraform
+      command: scripts/setup_service_account.sh
+      environment:
+        GCP_SERVICE_ACCOUNT_EMAIL: $GCP_SERVICE_ACCOUNT_EMAIL
+        GCP_SERVICE_ACCOUNT_KEY: $GCP_SERVICE_ACCOUNT_KEY
+
+  lintTerraform:
+    description: Check for linting errors in Terraform files.
+    group: Linting tasks
+    run:
+      container: terraform
+      command: terraform fmt -diff -check -recursive src
+
+  lintFixTerraform:
+    description: Fix linting errors in Terraform files.
+    group: Linting tasks
+    run:
+      container: terraform
+      command: terraform fmt -recursive src

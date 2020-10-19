@@ -1,0 +1,10 @@
+.batect/caches
+.creds/
+.gcloud/
+.idea/
+.terraform/
+
+batect.local.yml
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info

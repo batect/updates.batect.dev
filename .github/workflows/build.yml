@@ -31,6 +31,12 @@ jobs:
           GCP_SERVICE_ACCOUNT_EMAIL: github-actions@batect-updates-prod.iam.gserviceaccount.com
           GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
+      - name: Setup Cloudflare key
+        run: ./batect setupCloudflareKey
+        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/master' && github.event_name == 'push'
+        env:
+          CLOUDFLARE_KEY: ${{ secrets.CLOUDFLARE_KEY }}
+
       - name: Setup Terraform
         run: ./batect setupTerraform
         if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/master' && github.event_name == 'push'

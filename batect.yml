@@ -14,6 +14,9 @@ containers:
       GOOGLE_PROJECT: batect-updates-prod
       GOOGLE_ORGANIZATION: 31831307074
 
+  observatory:
+    build_directory: .batect/observatory
+
 tasks:
   setupTerraform:
     description: Initialise Terraform.
@@ -94,3 +97,12 @@ tasks:
       command: sh -c "echo $CLOUDFLARE_KEY > .creds/cloudflare_key"
       environment:
         CLOUDFLARE_KEY: $CLOUDFLARE_KEY
+
+  checkSecurity:
+    description: Check HTTP security of deployed service.
+    group: Test tasks
+    run:
+      container: observatory
+      command: sh -c "observatory $DOMAIN --format report --zero --rescan && observatory $DOMAIN --format report --min-grade A+ --min-score 100"
+      environment:
+        DOMAIN: updates.batect.dev

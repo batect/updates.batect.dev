@@ -51,3 +51,6 @@ jobs:
       - name: Cleanup credentials
         run: sudo rm -rf .creds .gcloud
 
+      - name: Run smoke test
+        run: ./batect smokeTest
+        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/master' && github.event_name == 'push'

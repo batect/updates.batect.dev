@@ -37,3 +37,9 @@ resource "google_storage_bucket_iam_member" "all_users_viewers" {
   role   = "roles/storage.legacyObjectReader"
   member = "allUsers"
 }
+
+resource "google_storage_bucket_iam_binding" "public_uploaders" {
+  bucket  = google_storage_bucket.public.name
+  members = ["group:${data.google_project.project.name}-uploaders@batect.dev"]
+  role    = "projects/${data.google_project.project.name}/roles/uploader"
+}

@@ -77,7 +77,7 @@ resource "google_monitoring_uptime_check_config" "api_latest_update_endpoint" {
   period       = "300s"
 
   http_check {
-    path         = "/ping"
+    path         = "/v1/latest"
     use_ssl      = true
     validate_ssl = true
   }

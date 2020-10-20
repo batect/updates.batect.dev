@@ -3,6 +3,10 @@ addEventListener('fetch', event => {
 });
 
 async function handleRequest(request) {
+    if (request.method !== "GET") {
+        return new Response("Method not allowed", { status: 405 });
+    }
+
     const originResponse = await getResponse(request);
     const modifiedResponse = new Response(originResponse.body, originResponse);
 

@@ -74,7 +74,7 @@ resource "google_monitoring_alert_policy" "api_ping_endpoint" {
 resource "google_monitoring_uptime_check_config" "api_latest_update_endpoint" {
   display_name = "API (/v1/latest)"
   timeout      = "10s"
-  period       = "300s"
+  period       = "600s"
 
   http_check {
     path         = "/v1/latest"

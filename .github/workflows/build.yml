@@ -29,28 +29,28 @@ jobs:
 
       - name: Log in to GCP
         run: ./batect setupGCPServiceAccount
-        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/master' && github.event_name == 'push'
+        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           GCP_SERVICE_ACCOUNT_EMAIL: github-actions@batect-updates-prod.iam.gserviceaccount.com
           GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
       - name: Setup Cloudflare key
         run: ./batect setupCloudflareKey
-        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/master' && github.event_name == 'push'
+        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           CLOUDFLARE_KEY: ${{ secrets.CLOUDFLARE_KEY }}
 
       - name: Setup Terraform
         run: ./batect setupTerraform
-        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/master' && github.event_name == 'push'
+        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/main' && github.event_name == 'push'
 
       - name: Apply Terraform
         run: ./batect applyTerraform
-        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/master' && github.event_name == 'push'
+        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/main' && github.event_name == 'push'
 
       - name: Cleanup credentials
         run: sudo rm -rf .creds .gcloud
 
       - name: Run smoke test
         run: ./batect smokeTest
-        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/master' && github.event_name == 'push'
+        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/main' && github.event_name == 'push'

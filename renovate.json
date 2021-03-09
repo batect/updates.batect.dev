@@ -8,8 +8,7 @@
         "batect",
         "batect-wrapper",
         "dockerfile"
-      ],
-      "automerge": true
+      ]
     },
     {
       "matchManagers": ["gomod"],
@@ -17,8 +16,7 @@
         "^go.opentelemetry.io/",
         "^github.com/GoogleCloudPlatform/opentelemetry-operations-go/"
       ],
-      "groupName": "OpenTelemetry packages",
-      "automerge": true
+      "groupName": "OpenTelemetry packages"
     },
     {
       "matchManagers": ["gomod"],
@@ -27,8 +25,7 @@
         "github.com/onsi/ginkgo",
         "github.com/onsi/gomega",
         "google.golang.org/api"
-      ],
-      "automerge": true
+      ]
     },
     {
       "matchManagers": ["regex"],

@@ -17,10 +17,15 @@
 // See both the License and the Condition for the specific language governing permissions and
 // limitations under the License and the Condition.
 
+locals {
+  five_minutes = "300s"
+  ten_minutes  = "600s"
+}
+
 resource "google_monitoring_uptime_check_config" "api_ping_endpoint" {
   display_name = "API (/ping)"
   timeout      = "10s"
-  period       = "300s"
+  period       = local.five_minutes
 
   http_check {
     path         = "/ping"
@@ -52,7 +57,7 @@ resource "google_monitoring_alert_policy" "api_ping_endpoint" {
     condition_threshold {
       filter          = "metric.type=\"monitoring.googleapis.com/uptime_check/check_passed\" resource.type=\"uptime_url\" metric.label.check_id=\"${google_monitoring_uptime_check_config.api_ping_endpoint.uptime_check_id}\""
       comparison      = "COMPARISON_GT"
-      duration        = "300s"
+      duration        = local.five_minutes
       threshold_value = 1
 
       trigger {
@@ -74,7 +79,7 @@ resource "google_monitoring_alert_policy" "api_ping_endpoint" {
 resource "google_monitoring_uptime_check_config" "api_latest_update_endpoint" {
   display_name = "API (/v1/latest)"
   timeout      = "10s"
-  period       = "600s"
+  period       = local.ten_minutes
 
   http_check {
     path         = "/v1/latest"
@@ -105,7 +110,7 @@ resource "google_monitoring_alert_policy" "api_latest_update_endpoint" {
     condition_threshold {
       filter          = "metric.type=\"monitoring.googleapis.com/uptime_check/check_passed\" resource.type=\"uptime_url\" metric.label.check_id=\"${google_monitoring_uptime_check_config.api_latest_update_endpoint.uptime_check_id}\""
       comparison      = "COMPARISON_GT"
-      duration        = "300s"
+      duration        = local.ten_minutes
       threshold_value = 1
 
       trigger {

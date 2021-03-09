@@ -49,7 +49,7 @@ tasks:
     run:
       container: terraform
       command: sh -c './scripts/generate_vars.sh && terraform init -input=false -reconfigure -backend-config="bucket=$GOOGLE_PROJECT-terraform-state" -backend-config="credentials=../.creds/gcp_service_account_${CLOUDSDK_ACTIVE_CONFIG_NAME}.json"'
-      working_directory: /code/src
+      working_directory: /code/infra
       environment:
         CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
         ROOT_DOMAIN: <{rootDomain}
@@ -61,7 +61,7 @@ tasks:
     run:
       container: terraform
       command: terraform apply -input=false -auto-approve
-      working_directory: /code/src
+      working_directory: /code/infra
       environment:
         CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
         ROOT_DOMAIN: <{rootDomain}
@@ -73,7 +73,7 @@ tasks:
     run:
       container: terraform
       command: terraform plan -input=false
-      working_directory: /code/src
+      working_directory: /code/infra
       environment:
         CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
 
@@ -83,7 +83,7 @@ tasks:
     run:
       container: terraform
       command: terraform destroy -input=false -auto-approve
-      working_directory: /code/src
+      working_directory: /code/infra
       environment:
         CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
 
@@ -93,7 +93,7 @@ tasks:
     run:
       container: terraform
       command: terraform plan -detailed-exitcode -input=false -lock=false
-      working_directory: /code/src
+      working_directory: /code/infra
       environment:
         CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
 
@@ -120,14 +120,14 @@ tasks:
     group: Linting tasks
     run:
       container: terraform
-      command: terraform fmt -diff -check -recursive src
+      command: terraform fmt -diff -check -recursive infra
 
   lintFixTerraform:
     description: Fix linting errors in Terraform files.
     group: Linting tasks
     run:
       container: terraform
-      command: terraform fmt -recursive src
+      command: terraform fmt -recursive infra
 
   setupCloudflareKey:
     description: Store credentials used to access Cloudflare when deploying the application.

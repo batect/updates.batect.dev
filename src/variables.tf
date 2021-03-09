@@ -17,36 +17,14 @@
 // See both the License and the Condition for the specific language governing permissions and
 // limitations under the License and the Condition.
 
-terraform {
-  required_providers {
-    cloudflare = {
-      version = "2.11.0"
-      source  = "cloudflare/cloudflare"
-    }
-
-    google = {
-      version = "3.43.0"
-      source  = "hashicorp/google"
-    }
-
-    google-beta = {
-      version = "3.43.0"
-      source  = "hashicorp/google-beta"
-    }
-  }
-
-  required_version = ">= 0.13"
+variable "cloud_sdk_config_name" {
+  type = string
 }
 
-provider "cloudflare" {
-  api_token  = trimspace(file("${path.module}/../.creds/cloudflare_key"))
-  account_id = "4d106699f468851a1f005ce8ae96ba5a"
+variable "root_domain" {
+  type = string
 }
 
-provider "google" {
-  credentials = "${path.module}/../.creds/gcp_service_account_${var.cloud_sdk_config_name}.json"
-}
-
-provider "google-beta" {
-  credentials = "${path.module}/../.creds/gcp_service_account_${var.cloud_sdk_config_name}.json"
+variable "subdomain" {
+  type = string
 }

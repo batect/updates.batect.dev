@@ -48,10 +48,10 @@ tasks:
     group: Infrastructure management tasks
     run:
       container: terraform
-      command: sh -c 'terraform init -input=false -reconfigure -backend-config="bucket=$GOOGLE_PROJECT-terraform-state" -backend-config="credentials=../.creds/gcp_service_account_${CLOUDSDK_ACTIVE_CONFIG_NAME}.json"'
+      command: sh -c './scripts/generate_vars.sh && terraform init -input=false -reconfigure -backend-config="bucket=$GOOGLE_PROJECT-terraform-state" -backend-config="credentials=../.creds/gcp_service_account_${CLOUDSDK_ACTIVE_CONFIG_NAME}.json"'
       working_directory: /code/src
       environment:
-        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
+        CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
         ROOT_DOMAIN: <{rootDomain}
         SUBDOMAIN: <{subdomain}
 
@@ -63,7 +63,7 @@ tasks:
       command: terraform apply -input=false -auto-approve
       working_directory: /code/src
       environment:
-        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
+        CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
         ROOT_DOMAIN: <{rootDomain}
         SUBDOMAIN: <{subdomain}
 
@@ -75,7 +75,7 @@ tasks:
       command: terraform plan -input=false
       working_directory: /code/src
       environment:
-        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
+        CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
 
   destroyTerraform:
     description: Run Terraform to provision infrastructure.
@@ -85,7 +85,7 @@ tasks:
       command: terraform destroy -input=false -auto-approve
       working_directory: /code/src
       environment:
-        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
+        CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
 
   checkTerraformState:
     description: Check that the infrastructure matches the desired state.
@@ -95,7 +95,7 @@ tasks:
       command: terraform plan -detailed-exitcode -input=false -lock=false
       working_directory: /code/src
       environment:
-        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
+        CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
 
   terraformShell:
     description: Start a shell in the Terraform environment.
@@ -113,7 +113,7 @@ tasks:
       environment:
         GCP_SERVICE_ACCOUNT_EMAIL: $GCP_SERVICE_ACCOUNT_EMAIL
         GCP_SERVICE_ACCOUNT_KEY: $GCP_SERVICE_ACCOUNT_KEY
-        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
+        CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
 
   lintTerraform:
     description: Check for linting errors in Terraform files.

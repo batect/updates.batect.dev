@@ -42,6 +42,11 @@ func methodNotAllowed(ctx context.Context, w http.ResponseWriter, allowedMethod 
 	resp.Write(ctx, w, http.StatusMethodNotAllowed)
 }
 
+func serviceUnavailable(ctx context.Context, w http.ResponseWriter) {
+	resp := errorResponse{Message: "Service unavailable"}
+	resp.Write(ctx, w, http.StatusServiceUnavailable)
+}
+
 func (e *errorResponse) Write(ctx context.Context, w http.ResponseWriter, status int) {
 	log := middleware.LoggerFromContext(ctx)
 	log.WithField("errorResponse", e).WithField("statusCode", status).Warn("Returning error to client.")

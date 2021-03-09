@@ -50,6 +50,9 @@ containers:
       GOOGLE_PROJECT: <{gcpProject}
       GOOGLE_APPLICATION_CREDENTIALS: /creds/gcp.json
 
+  cloud-storage:
+    build_directory: .batect/fake-gcs-server
+
   observatory:
     build_directory: .batect/observatory
 

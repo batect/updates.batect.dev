@@ -1,3 +1,4 @@
+.batect/app/updates
 .batect/caches
 .creds/
 .gcloud/

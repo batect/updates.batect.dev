@@ -21,6 +21,38 @@ jobs:
           path: ~/.batect/cache
           key: batect-${{ hashFiles('batect') }}
 
+      - name: Cache Golang dependencies
+        uses: actions/cache@v2.1.4
+        with:
+          path: .batect/caches/go-cache
+          key: golang-${{ hashFiles('go.sum') }}
+          restore-keys: |
+            golang-
+
+      - name: Download dependencies
+        run: ./batect setup
+
+      - name: Build application
+        run: ./batect build
+
+      - name: Lint code
+        run: ./batect lint
+
+      - name: Check code files have license header
+        run: ./batect checkLicenseHeader
+
+      - name: Run unit tests
+        run: ./batect unitTest
+
+      - name: Run integration tests
+        run: ./batect integrationTest
+
+      - name: Upload coverage to codecov.io
+        uses: codecov/codecov-action@v1.2.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: server
+
       - name: Lint Terraform files
         run: ./batect --config-vars-file=batect.prod.yml lintTerraform
 

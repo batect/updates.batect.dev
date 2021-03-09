@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-BASE_URL="https://$1"
+BASE_URL="${1:-https://$DOMAIN}"
 
 function main() {
   checkPing

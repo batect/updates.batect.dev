@@ -39,10 +39,102 @@ containers:
       TF_CLI_ARGS_destroy: -state=terraform-<{gcpProject}.tfstate
       TF_CLI_ARGS_state_list: -state=terraform-<{gcpProject}.tfstate
 
+  app:
+    build_directory: .batect/app
+    volumes:
+      - local: .creds/application_service_account_personal.json
+        container: /creds/gcp.json
+        options: ro
+    environment:
+      PORT: 8080
+      GOOGLE_PROJECT: <{gcpProject}
+      GOOGLE_APPLICATION_CREDENTIALS: /creds/gcp.json
+
   observatory:
     build_directory: .batect/observatory
 
 tasks:
+  setup:
+    description: Download all dependencies used by the application.
+    group: Setup tasks
+    run:
+      container: build-env
+      command: sh -c 'go mod download && go get github.com/onsi/ginkgo/ginkgo'
+
+  build:
+    description: Build the application.
+    group: Build tasks
+    run:
+      container: build-env
+      command: go build -o .batect/app/updates ./server/cmd
+      environment:
+        CGO_ENABLED: 0
+        GOOS: linux
+
+  unitTest:
+    description: Run the unit tests.
+    group: Test tasks
+    run:
+      container: build-env
+      command: ginkgo --regexScansFilePath --skip='_integration_test.go$' -race -coverprofile=coverage.txt -covermode=atomic server/...
+
+  continuousUnitTest:
+    description: Run the unit tests, and re-run them when any code changes are detected.
+    group: Test tasks
+    run:
+      container: build-env
+      command: ginkgo watch --regexScansFilePath --skip='_integration_test.go$' server/...
+
+  integrationTest:
+    description: Run the integration tests.
+    group: Test tasks
+    dependencies:
+      - cloud-storage
+    run:
+      container: build-env
+      command: ginkgo --regexScansFilePath --focus='_integration_test.go$' server/...
+      environment:
+        STORAGE_EMULATOR_HOST: cloud-storage
+
+  shell:
+    description: Start a shell in the development environment.
+    group: Utility tasks
+    run:
+      container: build-env
+      command: bash
+
+  run:
+    description: Run the application.
+    group: Test tasks
+    prerequisites:
+      - build
+    run:
+      container: app
+      ports:
+        - local: 8080
+          container: 8080
+
+  lint:
+    description: Check for linting errors in Golang files.
+    group: Linting tasks
+    run:
+      container: build-env
+      command: golangci-lint run server/...
+
+  lintFix:
+    description: Fix linting errors in Golang files.
+    group: Linting tasks
+    run:
+      container: build-env
+      command: golangci-lint run --fix server/...
+
+  update:
+    description: Update to latest minor or patch update of all dependencies.
+    group: Dependency management tasks
+    run:
+      container: build-env
+      command: sh -c 'go get -u && go mod tidy'
+
   setupTerraform:
     description: Initialise Terraform.
     group: Infrastructure management tasks
@@ -159,7 +251,7 @@ tasks:
     group: Test tasks
     run:
       container: terraform
-      command: sh -c "./scripts/smoke_test.sh $DOMAIN"
+      command: ./scripts/smoke_test.sh
       environment:
         DOMAIN: <{subdomain}.<{rootDomain}
 

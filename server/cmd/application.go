@@ -20,17 +20,22 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
+	cloudstorage "cloud.google.com/go/storage"
 	"github.com/batect/service-observability/graceful"
 	"github.com/batect/service-observability/middleware"
 	"github.com/batect/service-observability/startup"
 	"github.com/batect/service-observability/tracing"
 	"github.com/batect/updates.batect.dev/server/api"
+	"github.com/batect/updates.batect.dev/server/storage"
 	"github.com/sirupsen/logrus"
 	"github.com/unrolled/secure"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 func main() {
@@ -49,6 +54,7 @@ func main() {
 func createServer(port string) *http.Server {
 	mux := http.NewServeMux()
 	mux.Handle("/ping", otelhttp.WithRouteTag("/ping", http.HandlerFunc(api.Ping)))
+	mux.Handle("/v1/latest", otelhttp.WithRouteTag("/v1/latest", createLatestHandler()))
 
 	securityHeaders := secure.New(secure.Options{
 		FrameDeny:             true,
@@ -76,4 +82,35 @@ func createServer(port string) *http.Server {
 	}
 
 	return srv
+}
+
+func createLatestHandler() http.Handler {
+	scopesOption := option.WithScopes(cloudstorage.ScopeReadWrite)
+	credsOption := option.WithCredentialsFile(getCredentialsFilePath())
+	tracingClientOption := withTracingClient(scopesOption, credsOption)
+	bucketName := fmt.Sprintf("%v-public", getProjectID())
+	store, err := storage.NewCloudStorageLatestVersionStore(bucketName, tracingClientOption)
+
+	if err != nil {
+		logrus.WithError(err).Fatal("Could not create version store.")
+	}
+
+	return api.NewLatestHandler(store)
+}
+
+func withTracingClient(opts ...option.ClientOption) option.ClientOption {
+	// We have to do this because setting http.DefaultTransport to a non-default implementation causes something deep in the bowels of the
+	// Google Cloud SDK to ignore it and create a fresh transport with many of the settings copied across from DefaultTransport.
+	// Being explicit about the client forces the SDK to use the transport.
+	trans, err := htransport.NewTransport(context.Background(), http.DefaultTransport, opts...)
+
+	if err != nil {
+		logrus.WithError(err).Fatal("could not create transport")
+	}
+
+	httpClient := http.Client{
+		Transport: trans,
+	}
+
+	return option.WithHTTPClient(&httpClient)
 }

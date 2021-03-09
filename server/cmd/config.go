@@ -49,6 +49,17 @@ func getProjectID() string {
 	return getEnvOrExit("GOOGLE_PROJECT")
 }
 
+func getCredentialsFilePath() string {
+	variableName := "GOOGLE_APPLICATION_CREDENTIALS"
+	value := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
+
+	if value == "" {
+		logrus.WithField("variable", variableName).Info("Credentials file environment variable is not set, will fallback to default credential sources for GCP connections.")
+	}
+
+	return value
+}
+
 func getEnvOrExit(name string) string {
 	value := os.Getenv(name)
 

@@ -20,11 +20,11 @@
 locals {
   # We can't look this up with a data resource without giving access to all zones in the Cloudflare account :sadface:
   cloudflare_zone_id = "b285aeea52df6b888cdee6d2551ebd32"
-  domain_name        = "updates.batect.dev"
+  domain_name        = "${var.subdomain}.${var.root_domain}"
 }
 
 resource "cloudflare_worker_script" "rewrite" {
-  name    = "updates_rewrite"
+  name    = "updates_rewrite-${replace(local.domain_name, ".", "_")}"
   content = file("worker.js")
 }
 
@@ -35,7 +35,7 @@ resource "cloudflare_worker_route" "rewrite" {
 }
 
 resource "cloudflare_record" "dns" {
-  name    = "updates"
+  name    = var.subdomain
   type    = "A"
   zone_id = local.cloudflare_zone_id
   value   = "1.1.1.1" # Dummy value, never used.

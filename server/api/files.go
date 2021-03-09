@@ -24,12 +24,14 @@ import (
 	"regexp"
 )
 
-var filesPathPattern = regexp.MustCompile(`^/v1/files/(?P<versionInPath>\d+\.\d+\.\d+)/batect-(?P<versionInFileName>\d+\.\d+\.\d+).jar$`)
-
-type filesHandler struct{}
+type filesHandler struct {
+	urlPattern *regexp.Regexp
+}
 
 func NewFilesHandler() http.Handler {
-	return &filesHandler{}
+	return &filesHandler{
+		urlPattern: regexp.MustCompile(`^/v1/files/(?P<versionInPath>\d+\.\d+\.\d+)/batect-(?P<versionInFileName>\d+\.\d+\.\d+).jar$`),
+	}
 }
 
 func (h *filesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -37,7 +39,7 @@ func (h *filesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	match := filesPathPattern.FindStringSubmatch(req.URL.Path)
+	match := h.urlPattern.FindStringSubmatch(req.URL.Path)
 
 	if match == nil {
 		http.NotFound(w, req)

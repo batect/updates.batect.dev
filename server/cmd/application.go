@@ -55,6 +55,7 @@ func createServer(port string) *http.Server {
 	mux := http.NewServeMux()
 	mux.Handle("/ping", otelhttp.WithRouteTag("/ping", http.HandlerFunc(api.Ping)))
 	mux.Handle("/v1/latest", otelhttp.WithRouteTag("/v1/latest", createLatestHandler()))
+	mux.Handle("/v1/files/", otelhttp.WithRouteTag("/v1/files", api.NewFilesHandler()))
 
 	securityHeaders := secure.New(secure.Options{
 		FrameDeny:             true,

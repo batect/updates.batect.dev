@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-BASE_URL=${1:-https://updates.batect.dev}
+BASE_URL="https://$1"
 
 function main() {
   checkPing

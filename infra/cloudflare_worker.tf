@@ -38,6 +38,6 @@ resource "cloudflare_record" "dns" {
   name    = var.subdomain
   type    = "A"
   zone_id = local.cloudflare_zone_id
-  value   = "1.1.1.1" # Dummy value, never used.
+  value   = "192.0.2.1" # Dummy value, never used.
   proxied = true
 }

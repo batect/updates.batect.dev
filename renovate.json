@@ -1,0 +1,84 @@
+{
+  "extends": [
+    "github>batect/renovate-config:default"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "batect",
+        "batect-wrapper",
+        "dockerfile"
+      ],
+      "automerge": true
+    },
+    {
+      "matchManagers": ["gomod"],
+      "matchPackagePatterns": [
+        "^go.opentelemetry.io/",
+        "^github.com/GoogleCloudPlatform/opentelemetry-operations-go/"
+      ],
+      "groupName": "OpenTelemetry packages",
+      "automerge": true
+    },
+    {
+      "matchManagers": ["gomod"],
+      "matchPackageNames": [
+        "github.com/google/uuid",
+        "github.com/onsi/ginkgo",
+        "github.com/onsi/gomega",
+        "google.golang.org/api"
+      ],
+      "automerge": true
+    },
+    {
+      "matchManagers": ["regex"],
+      "matchPackageNames": ["gcr.io/google.com/cloudsdktool/cloud-sdk"],
+      "commitMessageTopic": "gcloud",
+      "commitMessageExtra": "to {{#if isSingleVersion}}v{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}",
+      "additionalBranchPrefix": "",
+      "branchTopic": "gcloud-{{{newMajor}}}.{{{newMinor}}}"
+    },
+    {
+      "matchManagers": ["terraform"],
+      "stabilityDays": 1,
+      "prCreation": "not-pending"
+    },
+    {
+      "matchManagers": ["regex"],
+      "matchPackageNames": ["hashicorp/terraform"],
+      "extractVersion": "^v(?<version>.*)$",
+      "fileMatch": ["(^|/)Dockerfile$"]
+    }
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "(^|/)batect.yml$"
+      ],
+      "matchStrings": [
+        "cloudSdkVersion:\\s*\\n\\s*default:\\s+(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "gcr.io/google.com/cloudsdktool/cloud-sdk",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": [
+        "(^|/)Dockerfile$"
+      ],
+      "matchStrings": [
+        "ENV TERRAFORM_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "hashicorp/terraform",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "fileMatch": [
+        "(^|/)Dockerfile$"
+      ],
+      "matchStrings": [
+        "RUN npm install -g (?<depName>[a-zA-Z0-9_-]+)@(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "npm"
+    }
+  ]
+}

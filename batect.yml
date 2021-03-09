@@ -1,6 +1,8 @@
 containers:
   terraform:
     build_directory: .batect/terraform
+    build_args:
+      CLOUD_SDK_VERSION: <{cloudSdkVersion}
     volumes:
       - local: .
         container: /code
@@ -10,9 +12,13 @@ containers:
         options: cached
     working_directory: /code
     environment:
-      CLOUDSDK_ACTIVE_CONFIG_NAME: local
-      GOOGLE_PROJECT: batect-updates-prod
-      GOOGLE_ORGANIZATION: 31831307074
+      GOOGLE_PROJECT: <{gcpProject}
+      GOOGLE_REGION: <{gcpRegion}
+      TF_CLI_ARGS_import: -state=terraform-<{gcpProject}.tfstate
+      TF_CLI_ARGS_apply: -state=terraform-<{gcpProject}.tfstate
+      TF_CLI_ARGS_plan: -state=terraform-<{gcpProject}.tfstate
+      TF_CLI_ARGS_destroy: -state=terraform-<{gcpProject}.tfstate
+      TF_CLI_ARGS_state_list: -state=terraform-<{gcpProject}.tfstate
 
   observatory:
     build_directory: .batect/observatory
@@ -25,6 +31,10 @@ tasks:
       container: terraform
       command: sh -c 'terraform init -input=false -reconfigure -backend-config="bucket=$GOOGLE_PROJECT-terraform-state" -backend-config="credentials=../.creds/gcp_service_account_${CLOUDSDK_ACTIVE_CONFIG_NAME}.json"'
       working_directory: /code/src
+      environment:
+        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
+        ROOT_DOMAIN: <{rootDomain}
+        SUBDOMAIN: <{subdomain}
 
   applyTerraform:
     description: Run Terraform to provision infrastructure.
@@ -33,6 +43,10 @@ tasks:
       container: terraform
       command: terraform apply -input=false -auto-approve
       working_directory: /code/src
+      environment:
+        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
+        ROOT_DOMAIN: <{rootDomain}
+        SUBDOMAIN: <{subdomain}
 
   planTerraform:
     description: Plan changes required to bring infrastructure to desired state.
@@ -41,6 +55,8 @@ tasks:
       container: terraform
       command: terraform plan -input=false
       working_directory: /code/src
+      environment:
+        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
 
   destroyTerraform:
     description: Run Terraform to provision infrastructure.
@@ -49,6 +65,8 @@ tasks:
       container: terraform
       command: terraform destroy -input=false -auto-approve
       working_directory: /code/src
+      environment:
+        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
 
   checkTerraformState:
     description: Check that the infrastructure matches the desired state.
@@ -57,6 +75,8 @@ tasks:
       container: terraform
       command: terraform plan -detailed-exitcode -input=false -lock=false
       working_directory: /code/src
+      environment:
+        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
 
   terraformShell:
     description: Start a shell in the Terraform environment.
@@ -74,6 +94,7 @@ tasks:
       environment:
         GCP_SERVICE_ACCOUNT_EMAIL: $GCP_SERVICE_ACCOUNT_EMAIL
         GCP_SERVICE_ACCOUNT_KEY: $GCP_SERVICE_ACCOUNT_KEY
+        CLOUDSDK_ACTIVE_CONFIG_NAME: app-<{gcpProject}
 
   lintTerraform:
     description: Check for linting errors in Terraform files.
@@ -105,7 +126,7 @@ tasks:
       container: observatory
       command: sh -c "observatory $DOMAIN --format report --zero --rescan && observatory $DOMAIN --format report --min-grade A+ --min-score 100"
       environment:
-        DOMAIN: updates.batect.dev
+        DOMAIN: <{subdomain}.<{rootDomain}
 
   checkLicenseHeader:
     description: Check that all files have the required license header.
@@ -119,4 +140,23 @@ tasks:
     group: Test tasks
     run:
       container: terraform
-      command: ./scripts/smoke_test.sh
+      command: sh -c "./scripts/smoke_test.sh $DOMAIN"
+      environment:
+        DOMAIN: <{subdomain}.<{rootDomain}
+
+config_variables:
+  gcpProject:
+    description: GCP project to use.
+
+  gcpRegion:
+    default: us-central1
+
+  cloudSdkVersion:
+    default: 330.0.0
+
+  rootDomain:
+    description: Root domain name registered with Cloudflare.
+    default: batect.dev
+
+  subdomain:
+    description: Subdomain (under rootDomain) to host the application at.

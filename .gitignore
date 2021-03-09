@@ -5,6 +5,9 @@
 .terraform/
 
 batect.local.yml
+coverage.txt
+generated.auto.tfvars
+image.auto.tfvars
 *.tfstate
 *.tfstate.backup
 *.tfstate.lock.info

@@ -18,8 +18,8 @@
 // limitations under the License and the Condition.
 
 locals {
-  five_minutes   = "300s"
-  ten_minutes    = "600s"
+  five_minutes = "300s"
+  ten_minutes  = "600s"
 }
 
 resource "google_monitoring_uptime_check_config" "api_ping_endpoint" {

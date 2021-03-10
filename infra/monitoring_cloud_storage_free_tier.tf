@@ -18,13 +18,7 @@
 // limitations under the License and the Condition.
 
 locals {
-  bytes_in_kb                   = 1024
-  bytes_in_mb                   = 1024 * local.bytes_in_kb
-  bytes_in_gb                   = 1024 * local.bytes_in_mb
   cloud_storage_free_tier_bytes = 5 * local.bytes_in_gb
-
-  alert_threshold_percentage = 75
-  alert_threshold_decimal    = local.alert_threshold_percentage / 100
 
   cloud_storage_free_tier_class_a_operations_per_month              = 5000
   cloud_storage_free_tier_class_a_operations_per_second             = local.cloud_storage_free_tier_class_a_operations_per_month / local.seconds_in_month
@@ -45,9 +39,6 @@ locals {
 
   seconds_in_minute = 60
   seconds_in_hour   = 60 * local.seconds_in_minute
-  days_in_month     = 31
-  seconds_in_day    = 24 * local.seconds_in_hour
-  seconds_in_month  = local.days_in_month * local.seconds_in_day
   fifteen_minutes   = format("%ds", 15 * local.seconds_in_minute)
   six_hours         = format("%ds", 6 * local.seconds_in_hour)
 }

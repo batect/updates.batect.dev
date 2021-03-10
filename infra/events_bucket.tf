@@ -33,7 +33,7 @@ resource "google_storage_bucket" "events" {
 }
 
 resource "google_storage_bucket_iam_binding" "events_creation_access" {
-  bucket = google_storage_bucket.events.name
-  role   = "roles/storage.objectCreator"
+  bucket  = google_storage_bucket.events.name
+  role    = "roles/storage.objectCreator"
   members = ["serviceAccount:${data.google_service_account.service.email}"]
 }

@@ -17,6 +17,14 @@
 // See both the License and the Condition for the specific language governing permissions and
 // limitations under the License and the Condition.
 
+variable "image_reference" {
+  type = string
+}
+
+variable "image_git_sha" {
+  type = string
+}
+
 variable "cloud_sdk_config_name" {
   type = string
 }

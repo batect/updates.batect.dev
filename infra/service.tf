@@ -17,6 +17,58 @@
 // See both the License and the Condition for the specific language governing permissions and
 // limitations under the License and the Condition.
 
+locals {
+  service_name = "updates"
+
+  # Maximum length of revision name is 63 characters
+  service_revision_name = substr("${local.service_name}-${var.image_git_sha}-${regex("@sha256:(.*)$", var.image_reference)[0]}", 0, 63)
+}
+
 data "google_service_account" "service" {
   account_id = "service"
+}
+
+resource "google_cloud_run_service" "service" {
+  name     = local.service_name
+  location = "us-central1"
+
+  template {
+    spec {
+      service_account_name = data.google_service_account.service.email
+
+      containers {
+        image = var.image_reference
+
+        env {
+          name  = "GOOGLE_PROJECT"
+          value = data.google_project.project.name
+        }
+      }
+    }
+
+    metadata {
+      name = local.service_revision_name
+    }
+  }
+
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+}
+
+data "google_iam_policy" "allow_invoke_by_all" {
+  binding {
+    role = "roles/run.invoker"
+    members = [
+      "allUsers",
+    ]
+  }
+}
+
+resource "google_cloud_run_service_iam_policy" "allow_invoke_by_all" {
+  location = google_cloud_run_service.service.location
+  service  = google_cloud_run_service.service.name
+
+  policy_data = data.google_iam_policy.allow_invoke_by_all.policy_data
 }

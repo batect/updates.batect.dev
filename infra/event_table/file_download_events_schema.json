@@ -1,0 +1,17 @@
+[
+  {
+    "name": "eventId",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "timestamp",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "userAgent",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  }
+]

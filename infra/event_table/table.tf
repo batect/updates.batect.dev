@@ -17,32 +17,19 @@
 // See both the License and the Condition for the specific language governing permissions and
 // limitations under the License and the Condition.
 
-resource "google_storage_bucket" "events" {
-  name                        = "${data.google_project.project.name}-events"
-  project                     = data.google_project.project.name
-  location                    = "us-central1"
-  uniform_bucket_level_access = true
+resource "google_bigquery_table" "events_table" {
+  dataset_id = var.dataset_id
+  table_id   = var.table_id
 
-  versioning {
-    enabled = true
+  time_partitioning {
+    type                     = "DAY"
+    field                    = "timestamp"
+    require_partition_filter = true
   }
+
+  schema = var.schema
 
   lifecycle {
     prevent_destroy = true
   }
-}
-
-resource "google_storage_bucket_iam_binding" "events_creation_access" {
-  bucket  = google_storage_bucket.events.name
-  role    = "roles/storage.objectCreator"
-  members = ["serviceAccount:${data.google_service_account.service.email}"]
-}
-
-resource "google_storage_bucket_iam_binding" "events_read_access" {
-  bucket = google_storage_bucket.events.name
-  role   = "roles/storage.objectViewer"
-
-  members = [
-    "serviceAccount:${data.google_service_account.bigquery_transfer_service.email}",
-  ]
 }

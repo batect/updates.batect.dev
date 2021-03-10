@@ -23,16 +23,19 @@ import (
 	"net/http"
 
 	"github.com/batect/service-observability/middleware"
+	"github.com/batect/updates.batect.dev/server/events"
 	"github.com/batect/updates.batect.dev/server/storage"
 )
 
 type latestHandler struct {
-	store storage.LatestVersionStore
+	store     storage.LatestVersionStore
+	eventSink events.EventSink
 }
 
-func NewLatestHandler(store storage.LatestVersionStore) http.Handler {
+func NewLatestHandler(store storage.LatestVersionStore, eventSink events.EventSink) http.Handler {
 	return &latestHandler{
-		store: store,
+		store:     store,
+		eventSink: eventSink,
 	}
 }
 
@@ -51,6 +54,8 @@ func (h *latestHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		return
 	}
+
+	h.eventSink.PostLatestVersionCheck(req.Context(), req.UserAgent())
 
 	w.Header().Set(contentTypeHeader, descriptor.ContentType)
 

@@ -25,7 +25,6 @@ import (
 	"io/ioutil"
 
 	cloudstorage "cloud.google.com/go/storage"
-	"google.golang.org/api/option"
 )
 
 type cloudStorageLatestVersionStore struct {
@@ -33,19 +32,11 @@ type cloudStorageLatestVersionStore struct {
 	bucket *cloudstorage.BucketHandle
 }
 
-func NewCloudStorageLatestVersionStore(bucketName string, opts ...option.ClientOption) (LatestVersionStore, error) {
-	client, err := cloudstorage.NewClient(context.Background(), opts...)
-
-	if err != nil {
-		return nil, fmt.Errorf("could not create Cloud Storage client: %w", err)
-	}
-
-	store := cloudStorageLatestVersionStore{
+func NewCloudStorageLatestVersionStore(bucketName string, client *cloudstorage.Client) LatestVersionStore {
+	return &cloudStorageLatestVersionStore{
 		client: client,
 		bucket: client.Bucket(bucketName),
 	}
-
-	return &store, nil
 }
 
 func (c *cloudStorageLatestVersionStore) GetLatestVersionDescriptor(ctx context.Context) (VersionDescriptor, error) {

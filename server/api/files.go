@@ -22,15 +22,19 @@ package api
 import (
 	"net/http"
 	"regexp"
+
+	"github.com/batect/updates.batect.dev/server/events"
 )
 
 type filesHandler struct {
 	urlPattern *regexp.Regexp
+	eventSink  events.EventSink
 }
 
-func NewFilesHandler() http.Handler {
+func NewFilesHandler(eventSink events.EventSink) http.Handler {
 	return &filesHandler{
 		urlPattern: regexp.MustCompile(`^/v1/files/(?P<versionInPath>\d+\.\d+\.\d+)/batect-(?P<versionInFileName>\d+\.\d+\.\d+).jar$`),
+		eventSink:  eventSink,
 	}
 }
 
@@ -54,7 +58,12 @@ func (h *filesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Header().Set("Location", "https://github.com/batect/batect/releases/download/"+versionInPath+"/batect-"+versionInPath+".jar")
+	version := versionInPath
+	fileName := "batect-" + version + ".jar"
+
+	h.eventSink.PostFileDownload(req.Context(), req.UserAgent(), version, fileName)
+
+	w.Header().Set("Location", "https://github.com/batect/batect/releases/download/"+versionInPath+"/"+fileName)
 	w.Header().Set("Cache-Control", "no-store, max-age=0")
 	w.WriteHeader(http.StatusFound)
 }

@@ -37,7 +37,7 @@ var _ = Describe("Getting version information from Cloud Storage", func() {
 
 	BeforeEach(func() {
 		project := "my-project"
-		bucketName := "test-bucket-" + uuid.New().String()
+		bucketName := "test-version-store-" + uuid.New().String()
 
 		// Note that we also have to set the STORAGE_EMULATOR_HOST environment variable so that object downloads
 		// are done from the correct host and over HTTP (rather than HTTPS).
@@ -52,8 +52,7 @@ var _ = Describe("Getting version information from Cloud Storage", func() {
 		err = bucket.Create(context.Background(), project, nil)
 		Expect(err).ToNot(HaveOccurred())
 
-		store, err = storage.NewCloudStorageLatestVersionStore(bucketName, opts...)
-		Expect(err).ToNot(HaveOccurred())
+		store = storage.NewCloudStorageLatestVersionStore(bucketName, client)
 	})
 
 	Describe("given the version information file does not exist in the bucket", func() {

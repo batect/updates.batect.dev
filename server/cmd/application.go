@@ -30,6 +30,7 @@ import (
 	"github.com/batect/service-observability/startup"
 	"github.com/batect/service-observability/tracing"
 	"github.com/batect/updates.batect.dev/server/api"
+	"github.com/batect/updates.batect.dev/server/events"
 	"github.com/batect/updates.batect.dev/server/storage"
 	"github.com/sirupsen/logrus"
 	"github.com/unrolled/secure"
@@ -52,10 +53,13 @@ func main() {
 }
 
 func createServer(port string) *http.Server {
+	cloudStorageClient := createCloudStorageClient()
+	eventSink := createEventSink(cloudStorageClient)
+
 	mux := http.NewServeMux()
 	mux.Handle("/ping", otelhttp.WithRouteTag("/ping", http.HandlerFunc(api.Ping)))
-	mux.Handle("/v1/latest", otelhttp.WithRouteTag("/v1/latest", createLatestHandler()))
-	mux.Handle("/v1/files/", otelhttp.WithRouteTag("/v1/files", api.NewFilesHandler()))
+	mux.Handle("/v1/latest", otelhttp.WithRouteTag("/v1/latest", createLatestHandler(cloudStorageClient, eventSink)))
+	mux.Handle("/v1/files/", otelhttp.WithRouteTag("/v1/files", api.NewFilesHandler(eventSink)))
 
 	securityHeaders := secure.New(secure.Options{
 		FrameDeny:             true,
@@ -85,18 +89,30 @@ func createServer(port string) *http.Server {
 	return srv
 }
 
-func createLatestHandler() http.Handler {
+func createEventSink(cloudStorageClient *cloudstorage.Client) events.EventSink {
+	bucketName := fmt.Sprintf("%v-events", getProjectID())
+
+	return events.NewCloudStorageEventSink(bucketName, cloudStorageClient)
+}
+
+func createLatestHandler(cloudStorageClient *cloudstorage.Client, eventSink events.EventSink) http.Handler {
+	bucketName := fmt.Sprintf("%v-public", getProjectID())
+	store := storage.NewCloudStorageLatestVersionStore(bucketName, cloudStorageClient)
+
+	return api.NewLatestHandler(store, eventSink)
+}
+
+func createCloudStorageClient() *cloudstorage.Client {
 	scopesOption := option.WithScopes(cloudstorage.ScopeReadWrite)
 	credsOption := option.WithCredentialsFile(getCredentialsFilePath())
 	tracingClientOption := withTracingClient(scopesOption, credsOption)
-	bucketName := fmt.Sprintf("%v-public", getProjectID())
-	store, err := storage.NewCloudStorageLatestVersionStore(bucketName, tracingClientOption)
+	cloudStorageClient, err := cloudstorage.NewClient(context.Background(), tracingClientOption)
 
 	if err != nil {
-		logrus.WithError(err).Fatal("Could not create version store.")
+		logrus.WithError(err).Fatal("Could not create Cloud Storage client.")
 	}
 
-	return api.NewLatestHandler(store)
+	return cloudStorageClient
 }
 
 func withTracingClient(opts ...option.ClientOption) option.ClientOption {

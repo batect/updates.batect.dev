@@ -33,13 +33,15 @@ import (
 )
 
 var _ = Describe("Latest version endpoint", func() {
+	var eventSink *mockEventSink
 	var handler http.Handler
 	var latestVersionStoreMock *mockLatestVersionStore
 	var resp *httptest.ResponseRecorder
 
 	BeforeEach(func() {
+		eventSink = newMockEventSink()
 		latestVersionStoreMock = &mockLatestVersionStore{}
-		handler = api.NewLatestHandler(latestVersionStoreMock)
+		handler = api.NewLatestHandler(latestVersionStoreMock, eventSink)
 		resp = httptest.NewRecorder()
 	})
 
@@ -64,6 +66,10 @@ var _ = Describe("Latest version endpoint", func() {
 		It("sets the response Allow header", func() {
 			Expect(resp.Result().Header).To(HaveKeyWithValue("Allow", []string{"GET"}))
 		})
+
+		It("does not post any events", func() {
+			Expect(eventSink.LatestVersionCheckEventsPosted).To(BeEmpty())
+		})
 	})
 
 	Context("when invoked with a HTTP GET", func() {
@@ -71,6 +77,7 @@ var _ = Describe("Latest version endpoint", func() {
 
 		BeforeEach(func() {
 			req, _ = testutils.RequestWithTestLogger(httptest.NewRequest("GET", "/v1/latest", nil))
+			req.Header.Set("User-Agent", "MyApp/1.2.3")
 		})
 
 		Context("given retrieving the latest version information succeeds", func() {
@@ -95,6 +102,12 @@ var _ = Describe("Latest version endpoint", func() {
 			It("returns the content type provided by the version information source", func() {
 				Expect(resp.Result().Header).To(HaveKeyWithValue("Content-Type", []string{"application/json+descriptor"}))
 			})
+
+			It("posts a 'latest version check' event", func() {
+				Expect(eventSink.LatestVersionCheckEventsPosted).To(ConsistOf(latestVersionCheckEvent{
+					userAgent: "MyApp/1.2.3",
+				}))
+			})
 		})
 
 		Context("given retrieving the latest version information fails", func() {
@@ -115,6 +128,10 @@ var _ = Describe("Latest version endpoint", func() {
 
 			It("sets the response Content-Type header", func() {
 				Expect(resp.Result().Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
+			})
+
+			It("does not post any events", func() {
+				Expect(eventSink.LatestVersionCheckEventsPosted).To(BeEmpty())
 			})
 		})
 	})

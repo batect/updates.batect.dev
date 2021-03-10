@@ -67,3 +67,7 @@ issues:
     # Allow use of errors.New("...") - match on text until specific code is added as per https://github.com/Djarvur/go-err113/issues/10
     - text: "do not define dynamic errors, use wrapped static errors instead"
       linters: [goerr113]
+
+    - path: _test\.go
+      linters:
+        - dupl

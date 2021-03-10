@@ -30,11 +30,13 @@ import (
 )
 
 var _ = Describe("Files endpoint", func() {
+	var eventSink *mockEventSink
 	var handler http.Handler
 	var resp *httptest.ResponseRecorder
 
 	BeforeEach(func() {
-		handler = api.NewFilesHandler()
+		eventSink = newMockEventSink()
+		handler = api.NewFilesHandler(eventSink)
 		resp = httptest.NewRecorder()
 	})
 
@@ -59,12 +61,18 @@ var _ = Describe("Files endpoint", func() {
 		It("sets the response Allow header", func() {
 			Expect(resp.Result().Header).To(HaveKeyWithValue("Allow", []string{"GET"}))
 		})
+
+		It("does not post any events", func() {
+			Expect(eventSink.FileDownloadEventsPosted).To(BeEmpty())
+		})
 	})
 
 	Context("when invoked with a HTTP GET", func() {
 		Context("when invoked with a valid path", func() {
 			BeforeEach(func() {
 				req, _ := testutils.RequestWithTestLogger(httptest.NewRequest("GET", "/v1/files/0.1.2/batect-0.1.2.jar", nil))
+				req.Header.Set("User-Agent", "MyApp/1.2.3")
+
 				handler.ServeHTTP(resp, req)
 			})
 
@@ -86,6 +94,14 @@ var _ = Describe("Files endpoint", func() {
 
 			It("prevents caching of the response", func() {
 				Expect(resp.Result().Header).To(HaveKeyWithValue("Cache-Control", []string{"no-store, max-age=0"}))
+			})
+
+			It("posts a 'file download' event", func() {
+				Expect(eventSink.FileDownloadEventsPosted).To(ConsistOf(fileDownloadEvent{
+					userAgent: "MyApp/1.2.3",
+					version:   "0.1.2",
+					fileName:  "batect-0.1.2.jar",
+				}))
 			})
 		})
 
@@ -126,6 +142,10 @@ var _ = Describe("Files endpoint", func() {
 
 					It("includes the default Golang 404 error message in the body", func() {
 						Expect(resp.Body.String()).To(Equal("404 page not found\n"))
+					})
+
+					It("does not post any events", func() {
+						Expect(eventSink.FileDownloadEventsPosted).To(BeEmpty())
 					})
 				})
 			}

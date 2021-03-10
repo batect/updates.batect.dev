@@ -51,9 +51,8 @@ func (h *filesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	versionInPath := match[1]
-	versionInFileName := match[2]
 
-	if versionInPath != versionInFileName {
+	if versionInFileName := match[2]; versionInPath != versionInFileName {
 		http.NotFound(w, req)
 		return
 	}

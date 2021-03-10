@@ -22,12 +22,11 @@ package storage_test
 import (
 	"context"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
 	cloudstorage "cloud.google.com/go/storage"
 	"github.com/batect/updates.batect.dev/server/storage"
 	"github.com/google/uuid"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"google.golang.org/api/option"
 )
 

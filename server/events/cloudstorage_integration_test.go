@@ -25,13 +25,12 @@ import (
 	"io/ioutil"
 	"time"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
 	cloudstorage "cloud.google.com/go/storage"
 	"github.com/batect/service-observability/middleware/testutils"
 	"github.com/batect/updates.batect.dev/server/events"
 	"github.com/google/uuid"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	gomegatypes "github.com/onsi/gomega/types"
 	"github.com/sirupsen/logrus/hooks/test"
 	"google.golang.org/api/option"

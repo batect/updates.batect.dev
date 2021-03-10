@@ -32,10 +32,10 @@ resource "google_storage_bucket" "public" {
   }
 }
 
-resource "google_storage_bucket_iam_member" "all_users_viewers" {
-  bucket = google_storage_bucket.public.name
-  role   = "roles/storage.legacyObjectReader"
-  member = "allUsers"
+resource "google_storage_bucket_iam_binding" "public_viewers" {
+  bucket  = google_storage_bucket.public.name
+  role    = "roles/storage.legacyObjectReader"
+  members = ["serviceAccount:${data.google_service_account.service.email}"]
 }
 
 resource "google_storage_bucket_iam_binding" "public_uploaders" {

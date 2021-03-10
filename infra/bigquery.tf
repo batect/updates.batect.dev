@@ -26,10 +26,10 @@ resource "google_bigquery_dataset" "default" {
     special_group = "projectOwners"
   }
 
-  //  access {
-  //    role          = "WRITER"
-  //    user_by_email = "service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
-  //  }
+  access {
+    role          = "WRITER"
+    user_by_email = "service-${data.google_project.project.number}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com"
+  }
 
   lifecycle {
     prevent_destroy = true

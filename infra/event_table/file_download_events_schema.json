@@ -13,5 +13,15 @@
     "name": "userAgent",
     "type": "STRING",
     "mode": "REQUIRED"
+  },
+  {
+    "name": "version",
+    "type": "STRING",
+    "mode": "REQUIRED"
+  },
+  {
+    "name": "fileName",
+    "type": "STRING",
+    "mode": "REQUIRED"
   }
 ]

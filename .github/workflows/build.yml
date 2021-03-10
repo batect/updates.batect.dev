@@ -66,6 +66,10 @@ jobs:
           GCP_SERVICE_ACCOUNT_EMAIL: github-actions@batect-updates-prod.iam.gserviceaccount.com
           GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
+      - name: Push image
+        run: ./batect --config-vars-file=batect.prod.yml pushImage
+        if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/main' && github.event_name == 'push'
+
       - name: Setup Cloudflare key
         run: ./batect --config-vars-file=batect.prod.yml setupCloudflareKey
         if: github.repository == 'batect/updates.batect.dev' && github.ref == 'refs/heads/main' && github.event_name == 'push'

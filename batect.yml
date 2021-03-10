@@ -34,6 +34,24 @@ containers:
       GOOGLE_PROJECT: <{gcpProject}
       GOOGLE_REGION: <{gcpRegion}
 
+  push-env:
+    build_directory: .batect/push-env
+    build_args:
+      CLOUD_SDK_VERSION: <{cloudSdkVersion}
+    volumes:
+      - local: .
+        container: /code
+        options: cached
+      - local: .gcloud
+        container: /root/.config/gcloud
+        options: cached
+      - local: /var/run/docker.sock
+        container: /var/run/docker.sock
+    working_directory: /code
+    environment:
+      GOOGLE_PROJECT: <{gcpProject}
+      GOOGLE_REGION: <{gcpRegion}
+
   app:
     build_directory: .batect/app
     volumes:
@@ -218,6 +236,15 @@ tasks:
     run:
       container: terraform
       command: terraform fmt -recursive infra
+
+  pushImage:
+    description: Push the application image to GCP.
+    group: Deployment tasks
+    run:
+      container: push-env
+      command: ./infra/scripts/push_image.sh
+      environment:
+        CLOUDSDK_ACTIVE_CONFIG_NAME: <{gcpProject}
 
   setupCloudflareKey:
     description: Store credentials used to access Cloudflare when deploying the application.

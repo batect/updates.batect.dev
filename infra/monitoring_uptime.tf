@@ -20,7 +20,6 @@
 locals {
   five_minutes   = "300s"
   ten_minutes    = "600s"
-  twenty_minutes = "1200s"
 }
 
 resource "google_monitoring_uptime_check_config" "api_ping_endpoint" {
@@ -80,7 +79,7 @@ resource "google_monitoring_alert_policy" "api_ping_endpoint" {
 resource "google_monitoring_uptime_check_config" "api_latest_update_endpoint" {
   display_name = "API (/v1/latest)"
   timeout      = "10s"
-  period       = local.twenty_minutes # Per region - by default, this uptime check will run from every region (6 regions at the time of writing), so the check will run an average of once every ~3.3 minutes
+  period       = local.fifteen_minutes # Per region - by default, this uptime check will run from every region (6 regions at the time of writing), so the check will run an average of once every ~2.5 minutes
 
   http_check {
     path         = "/v1/latest"

@@ -37,7 +37,7 @@ resource "google_monitoring_uptime_check_config" "api_ping_endpoint" {
     type = "uptime_url"
     labels = {
       project_id = data.google_project.project.name
-      host       = local.domain_name
+      host       = local.api_dns_fqdn
     }
   }
 
@@ -91,7 +91,7 @@ resource "google_monitoring_uptime_check_config" "api_latest_update_endpoint" {
     type = "uptime_url"
     labels = {
       project_id = data.google_project.project.name
-      host       = local.domain_name
+      host       = local.api_dns_fqdn
     }
   }
 

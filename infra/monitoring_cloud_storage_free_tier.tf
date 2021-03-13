@@ -70,26 +70,7 @@ resource "google_monitoring_alert_policy" "cloud_storage_free_tier" {
     }
   }
 
-  conditions {
-    display_name = "Class A operations"
-
-    condition_threshold {
-      filter          = "metric.type=\"storage.googleapis.com/api/request_count\" resource.type=\"gcs_bucket\" ${local.cloud_storage_filter_to_class_a_operations}"
-      comparison      = "COMPARISON_GT"
-      duration        = local.six_hours
-      threshold_value = local.cloud_run_free_tier_alert_threshold_class_a_operations_per_second
-
-      trigger {
-        count = 1
-      }
-
-      aggregations {
-        alignment_period     = local.fifteen_minutes
-        cross_series_reducer = "REDUCE_SUM"
-        per_series_aligner   = "ALIGN_RATE"
-      }
-    }
-  }
+  // We will almost always exceed the Class A operations threshold, so there's not much point alerting on them.
 
   conditions {
     display_name = "Class B operations"

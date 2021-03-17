@@ -25,12 +25,12 @@ terraform {
     }
 
     google = {
-      version = "3.59.0"
+      version = "3.60.0"
       source  = "hashicorp/google"
     }
 
     google-beta = {
-      version = "3.59.0"
+      version = "3.60.0"
       source  = "hashicorp/google-beta"
     }
   }

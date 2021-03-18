@@ -28,11 +28,6 @@ terraform {
       version = "3.60.0"
       source  = "hashicorp/google"
     }
-
-    google-beta = {
-      version = "3.60.0"
-      source  = "hashicorp/google-beta"
-    }
   }
 
   required_version = ">= 0.13"
@@ -44,9 +39,5 @@ provider "cloudflare" {
 }
 
 provider "google" {
-  credentials = "${path.module}/../.creds/gcp_service_account_${var.cloud_sdk_config_name}.json"
-}
-
-provider "google-beta" {
   credentials = "${path.module}/../.creds/gcp_service_account_${var.cloud_sdk_config_name}.json"
 }

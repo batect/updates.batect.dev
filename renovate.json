@@ -14,6 +14,7 @@
       "matchManagers": ["gomod"],
       "matchPackagePatterns": [
         "^go.opentelemetry.io/",
+        "^github.com/batect/service-observability$",
         "^github.com/GoogleCloudPlatform/opentelemetry-operations-go/"
       ],
       "groupName": "OpenTelemetry packages"

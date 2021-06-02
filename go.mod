@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/storage v1.10.0
 	github.com/batect/service-observability v0.8.0
 	github.com/google/uuid v1.2.0
-	github.com/onsi/ginkgo v1.16.3
+	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.13.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/unrolled/secure v1.0.9

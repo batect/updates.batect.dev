@@ -57,6 +57,7 @@ func createServer(port string) *http.Server {
 	eventSink := createEventSink(cloudStorageClient)
 
 	mux := http.NewServeMux()
+	mux.Handle("/", otelhttp.WithRouteTag("/", http.HandlerFunc(api.Home)))
 	mux.Handle("/ping", otelhttp.WithRouteTag("/ping", http.HandlerFunc(api.Ping)))
 	mux.Handle("/v1/latest", otelhttp.WithRouteTag("/v1/latest", createLatestHandler(cloudStorageClient, eventSink)))
 	mux.Handle("/v1/files/", otelhttp.WithRouteTag("/v1/files", api.NewFilesHandler(eventSink)))

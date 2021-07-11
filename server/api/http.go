@@ -21,6 +21,7 @@ package api
 
 import "net/http"
 
+//nolint:unparam
 func requireMethod(w http.ResponseWriter, req *http.Request, method string) bool {
 	if req.Method != method {
 		methodNotAllowed(req.Context(), w, method)

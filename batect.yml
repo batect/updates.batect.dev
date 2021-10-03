@@ -275,8 +275,8 @@ tasks:
     description: Run a smoke test against a deployed version of the service.
     group: Test tasks
     run:
-      container: terraform
-      command: ./scripts/smoke_test.sh
+      container: build-env
+      command: go run ./scripts/smoketest
       environment:
         DOMAIN: <{subdomain}.<{rootDomain}
 

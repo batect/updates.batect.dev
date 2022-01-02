@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Charles Korn.
+// Copyright 2019-2022 Charles Korn.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // and the Commons Clause License Condition v1.0 (the "Condition");
@@ -78,7 +78,7 @@ func makeRequest(baseUrl string, path string) (*http.Response, error) {
 		},
 	}
 
-	req, err := http.NewRequest(http.MethodGet, baseUrl + path, nil)
+	req, err := http.NewRequest(http.MethodGet, baseUrl+path, nil)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)

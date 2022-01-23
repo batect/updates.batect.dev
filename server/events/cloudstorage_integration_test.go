@@ -29,7 +29,7 @@ import (
 	"github.com/batect/service-observability/middleware/testutils"
 	"github.com/batect/updates.batect.dev/server/events"
 	"github.com/google/uuid"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	gomegatypes "github.com/onsi/gomega/types"
 	"github.com/sirupsen/logrus/hooks/test"

@@ -25,7 +25,7 @@ import (
 	cloudstorage "cloud.google.com/go/storage"
 	"github.com/batect/updates.batect.dev/server/storage"
 	"github.com/google/uuid"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/api/option"
 )

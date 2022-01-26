@@ -3,8 +3,7 @@ module github.com/batect/updates.batect.dev
 go 1.16
 
 require (
-	cloud.google.com/go/iam v0.1.0 // indirect
-	cloud.google.com/go/storage v1.18.2
+	cloud.google.com/go/storage v1.19.0
 	github.com/batect/service-observability v0.13.0
 	github.com/google/uuid v1.3.0
 	github.com/onsi/ginkgo/v2 v2.1.0

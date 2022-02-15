@@ -9,7 +9,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.1.2
 	github.com/onsi/gomega v1.18.1
 	github.com/sirupsen/logrus v1.8.1
-	github.com/unrolled/secure v1.0.9
+	github.com/unrolled/secure v1.10.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.28.0
 	google.golang.org/api v0.68.0
 )

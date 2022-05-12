@@ -25,7 +25,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/batect/service-observability/middleware"
+	"github.com/batect/services-common/middleware"
 )
 
 const jsonMimeType = "application/json"

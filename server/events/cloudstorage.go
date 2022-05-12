@@ -27,7 +27,7 @@ import (
 	"time"
 
 	cloudstorage "cloud.google.com/go/storage"
-	"github.com/batect/service-observability/middleware"
+	"github.com/batect/services-common/middleware"
 	"github.com/google/uuid"
 )
 

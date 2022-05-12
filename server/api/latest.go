@@ -22,7 +22,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/batect/service-observability/middleware"
+	"github.com/batect/services-common/middleware"
 	"github.com/batect/updates.batect.dev/server/events"
 	"github.com/batect/updates.batect.dev/server/storage"
 )

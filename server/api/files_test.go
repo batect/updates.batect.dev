@@ -23,7 +23,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/batect/service-observability/middleware/testutils"
+	"github.com/batect/services-common/middleware/testutils"
 	"github.com/batect/updates.batect.dev/server/api"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

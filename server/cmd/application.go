@@ -23,12 +23,13 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	cloudstorage "cloud.google.com/go/storage"
-	"github.com/batect/service-observability/graceful"
-	"github.com/batect/service-observability/middleware"
-	"github.com/batect/service-observability/startup"
-	"github.com/batect/service-observability/tracing"
+	"github.com/batect/services-common/graceful"
+	"github.com/batect/services-common/middleware"
+	"github.com/batect/services-common/startup"
+	"github.com/batect/services-common/tracing"
 	"github.com/batect/updates.batect.dev/server/api"
 	"github.com/batect/updates.batect.dev/server/events"
 	"github.com/batect/updates.batect.dev/server/storage"
@@ -48,8 +49,16 @@ func main() {
 
 	defer flush()
 
+	runServer()
+}
+
+func runServer() {
 	srv := createServer(getPort())
-	graceful.RunServerWithGracefulShutdown(srv)
+
+	if err := graceful.RunServerWithGracefulShutdown(srv); err != nil {
+		logrus.WithError(err).Error("Could not run server.")
+		os.Exit(1)
+	}
 }
 
 func createServer(port string) *http.Server {

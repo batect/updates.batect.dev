@@ -26,7 +26,7 @@ import (
 	"time"
 
 	cloudstorage "cloud.google.com/go/storage"
-	"github.com/batect/service-observability/middleware/testutils"
+	"github.com/batect/services-common/middleware/testutils"
 	"github.com/batect/updates.batect.dev/server/events"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"

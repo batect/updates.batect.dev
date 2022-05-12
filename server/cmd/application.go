@@ -41,19 +41,32 @@ import (
 )
 
 func main() {
-	flush, err := startup.InitialiseObservability(getServiceName(), getVersion(), getProjectID())
+	config, err := getConfig()
 
 	if err != nil {
-		logrus.WithError(err).Fatal("Could not initialise observability.")
+		logrus.WithError(err).Error("Could not load application configuration.")
+		os.Exit(1)
+	}
+
+	flush, err := startup.InitialiseObservability(config.ServiceName, config.ServiceVersion, config.ProjectID)
+
+	if err != nil {
+		logrus.WithError(err).Error("Could not initialise observability tooling.")
+		os.Exit(1)
 	}
 
 	defer flush()
 
-	runServer()
+	runServer(config)
 }
 
-func runServer() {
-	srv := createServer(getPort())
+func runServer(config *serviceConfig) {
+	srv, err := createServer(config)
+
+	if err != nil {
+		logrus.WithError(err).Error("Could not create server.")
+		os.Exit(1)
+	}
 
 	if err := graceful.RunServerWithGracefulShutdown(srv); err != nil {
 		logrus.WithError(err).Error("Could not run server.")
@@ -61,14 +74,19 @@ func runServer() {
 	}
 }
 
-func createServer(port string) *http.Server {
-	cloudStorageClient := createCloudStorageClient()
-	eventSink := createEventSink(cloudStorageClient)
+func createServer(config *serviceConfig) (*http.Server, error) {
+	cloudStorageClient, err := createCloudStorageClient()
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create Cloud Storage client: %w", err)
+	}
+
+	eventSink := createEventSink(cloudStorageClient, config)
 
 	mux := http.NewServeMux()
 	mux.Handle("/", otelhttp.WithRouteTag("/", http.HandlerFunc(api.Home)))
 	mux.Handle("/ping", otelhttp.WithRouteTag("/ping", http.HandlerFunc(api.Ping)))
-	mux.Handle("/v1/latest", otelhttp.WithRouteTag("/v1/latest", createLatestHandler(cloudStorageClient, eventSink)))
+	mux.Handle("/v1/latest", otelhttp.WithRouteTag("/v1/latest", createLatestHandler(cloudStorageClient, eventSink, config)))
 	mux.Handle("/v1/files/", otelhttp.WithRouteTag("/v1/files", api.NewFilesHandler(eventSink)))
 
 	securityHeaders := secure.New(secure.Options{
@@ -81,13 +99,13 @@ func createServer(port string) *http.Server {
 	wrappedMux := middleware.TraceIDExtractionMiddleware(
 		middleware.LoggerMiddleware(
 			logrus.StandardLogger(),
-			getProjectID(),
+			config.ProjectID,
 			securityHeaders.Handler(mux),
 		),
 	)
 
 	srv := &http.Server{
-		Addr: fmt.Sprintf(":%s", port),
+		Addr: fmt.Sprintf(":%s", config.Port),
 		Handler: otelhttp.NewHandler(
 			wrappedMux,
 			"Updates API",
@@ -96,48 +114,53 @@ func createServer(port string) *http.Server {
 		),
 	}
 
-	return srv
+	return srv, nil
 }
 
-func createEventSink(cloudStorageClient *cloudstorage.Client) events.EventSink {
-	bucketName := fmt.Sprintf("%v-events", getProjectID())
+func createEventSink(cloudStorageClient *cloudstorage.Client, config *serviceConfig) events.EventSink {
+	bucketName := fmt.Sprintf("%v-events", config.ProjectID)
 
 	return events.NewCloudStorageEventSink(bucketName, cloudStorageClient)
 }
 
-func createLatestHandler(cloudStorageClient *cloudstorage.Client, eventSink events.EventSink) http.Handler {
-	bucketName := fmt.Sprintf("%v-public", getProjectID())
+func createLatestHandler(cloudStorageClient *cloudstorage.Client, eventSink events.EventSink, config *serviceConfig) http.Handler {
+	bucketName := fmt.Sprintf("%v-public", config.ProjectID)
 	store := storage.NewCloudStorageLatestVersionStore(bucketName, cloudStorageClient)
 
 	return api.NewLatestHandler(store, eventSink)
 }
 
-func createCloudStorageClient() *cloudstorage.Client {
+func createCloudStorageClient() (*cloudstorage.Client, error) {
 	scopesOption := option.WithScopes(cloudstorage.ScopeReadWrite)
 	credsOption := option.WithCredentialsFile(getCredentialsFilePath())
-	tracingClientOption := withTracingClient(scopesOption, credsOption)
+	tracingClientOption, err := withTracingClient(scopesOption, credsOption)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not create tracing client: %w", err)
+	}
+
 	cloudStorageClient, err := cloudstorage.NewClient(context.Background(), tracingClientOption)
 
 	if err != nil {
-		logrus.WithError(err).Fatal("Could not create Cloud Storage client.")
+		return nil, fmt.Errorf("could not create Cloud Storage client: %w", err)
 	}
 
-	return cloudStorageClient
+	return cloudStorageClient, nil
 }
 
-func withTracingClient(opts ...option.ClientOption) option.ClientOption {
+func withTracingClient(opts ...option.ClientOption) (option.ClientOption, error) {
 	// We have to do this because setting http.DefaultTransport to a non-default implementation causes something deep in the bowels of the
 	// Google Cloud SDK to ignore it and create a fresh transport with many of the settings copied across from DefaultTransport.
 	// Being explicit about the client forces the SDK to use the transport.
 	trans, err := htransport.NewTransport(context.Background(), http.DefaultTransport, opts...)
 
 	if err != nil {
-		logrus.WithError(err).Fatal("could not create transport")
+		return nil, fmt.Errorf("could not create transport: %w", err)
 	}
 
 	httpClient := http.Client{
 		Transport: trans,
 	}
 
-	return option.WithHTTPClient(&httpClient)
+	return option.WithHTTPClient(&httpClient), nil
 }

@@ -93,5 +93,8 @@
       "depNameTemplate": "golangci/golangci-lint",
       "datasourceTemplate": "github-releases"
     }
+  ],
+  "postUpdateOptions": [
+    "gomodTidy"
   ]
 }

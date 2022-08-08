@@ -22,7 +22,7 @@ package storage
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 
 	cloudstorage "cloud.google.com/go/storage"
 )
@@ -48,7 +48,7 @@ func (c *cloudStorageLatestVersionStore) GetLatestVersionDescriptor(ctx context.
 
 	defer reader.Close()
 
-	content, err := ioutil.ReadAll(reader)
+	content, err := io.ReadAll(reader)
 
 	if err != nil {
 		return VersionDescriptor{}, fmt.Errorf("could not read file content: %w", err)

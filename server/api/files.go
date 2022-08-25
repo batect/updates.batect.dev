@@ -39,6 +39,7 @@ func NewFilesHandler(eventSink events.EventSink) http.Handler {
 }
 
 func (h *filesHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	//nolint:contextcheck
 	if !requireMethod(w, req, http.MethodGet) {
 		return
 	}

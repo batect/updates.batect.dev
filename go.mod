@@ -6,8 +6,8 @@ require (
 	cloud.google.com/go/storage v1.27.0
 	github.com/batect/services-common v0.40.0
 	github.com/google/uuid v1.3.0
-	github.com/onsi/ginkgo/v2 v2.2.0
-	github.com/onsi/gomega v1.20.2
+	github.com/onsi/ginkgo/v2 v2.3.0
+	github.com/onsi/gomega v1.22.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/unrolled/secure v1.13.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.36.1

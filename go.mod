@@ -3,7 +3,7 @@ module github.com/batect/updates.batect.dev
 go 1.19
 
 require (
-	cloud.google.com/go/storage v1.27.0
+	cloud.google.com/go/storage v1.28.0
 	github.com/batect/services-common v0.45.0
 	github.com/google/uuid v1.3.0
 	github.com/onsi/ginkgo/v2 v2.4.0
@@ -18,7 +18,7 @@ require (
 	cloud.google.com/go v0.104.0 // indirect
 	cloud.google.com/go/compute v1.12.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.1 // indirect
-	cloud.google.com/go/iam v0.3.0 // indirect
+	cloud.google.com/go/iam v0.5.0 // indirect
 	cloud.google.com/go/monitoring v1.4.0 // indirect
 	cloud.google.com/go/profiler v0.3.0 // indirect
 	cloud.google.com/go/trace v1.2.0 // indirect

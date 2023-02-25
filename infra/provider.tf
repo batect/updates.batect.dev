@@ -20,7 +20,7 @@
 terraform {
   required_providers {
     cloudflare = {
-      version = "3.35.0"
+      version = "4.0.0"
       source  = "cloudflare/cloudflare"
     }
 
@@ -34,8 +34,7 @@ terraform {
 }
 
 provider "cloudflare" {
-  api_token  = trimspace(file("${path.module}/../.creds/cloudflare_key"))
-  account_id = "4d106699f468851a1f005ce8ae96ba5a"
+  api_token = trimspace(file("${path.module}/../.creds/cloudflare_key"))
 }
 
 provider "google" {

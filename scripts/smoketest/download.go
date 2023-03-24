@@ -29,8 +29,8 @@ func (t *downloadTest) Description() string {
 	return "check /v1/files/:version/:filename"
 }
 
-func (t *downloadTest) Run(baseUrl string) error {
-	resp, err := makeRequest(baseUrl, "/v1/files/0.0.0/batect-0.0.0.jar")
+func (t *downloadTest) Run(baseURL string) error {
+	resp, err := makeRequest(baseURL, "/v1/files/0.0.0/batect-0.0.0.jar")
 
 	if err != nil {
 		return err

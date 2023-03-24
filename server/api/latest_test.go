@@ -142,6 +142,6 @@ type mockLatestVersionStore struct {
 	errorToReturn      error
 }
 
-func (m *mockLatestVersionStore) GetLatestVersionDescriptor(ctx context.Context) (storage.VersionDescriptor, error) {
+func (m *mockLatestVersionStore) GetLatestVersionDescriptor(_ context.Context) (storage.VersionDescriptor, error) {
 	return m.descriptorToReturn, m.errorToReturn
 }

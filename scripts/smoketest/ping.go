@@ -21,7 +21,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 )
 
 type pingTest struct{}
@@ -30,8 +30,8 @@ func (t *pingTest) Description() string {
 	return "check /ping"
 }
 
-func (t *pingTest) Run(baseUrl string) error {
-	resp, err := makeRequest(baseUrl, "/ping")
+func (t *pingTest) Run(baseURL string) error {
+	resp, err := makeRequest(baseURL, "/ping")
 
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ func (t *pingTest) Run(baseUrl string) error {
 		return fmt.Errorf("response had non-200 status code %v", resp.StatusCode)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
 		return fmt.Errorf("could not read response body: %w", err)

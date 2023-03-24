@@ -43,14 +43,14 @@ func newMockEventSink() *mockEventSink {
 	}
 }
 
-func (m *mockEventSink) PostLatestVersionCheck(ctx context.Context, userAgent string) {
+func (m *mockEventSink) PostLatestVersionCheck(_ context.Context, userAgent string) {
 	m.LatestVersionCheckEventsPosted = append(
 		m.LatestVersionCheckEventsPosted,
 		latestVersionCheckEvent{userAgent: userAgent},
 	)
 }
 
-func (m *mockEventSink) PostFileDownload(ctx context.Context, userAgent string, version string, fileName string) {
+func (m *mockEventSink) PostFileDownload(_ context.Context, userAgent string, version string, fileName string) {
 	m.FileDownloadEventsPosted = append(
 		m.FileDownloadEventsPosted,
 		fileDownloadEvent{

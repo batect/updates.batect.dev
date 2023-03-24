@@ -20,6 +20,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -28,11 +29,11 @@ import (
 
 type test interface {
 	Description() string
-	Run(baseUrl string) error
+	Run(baseURL string) error
 }
 
 func main() {
-	baseUrl, err := getBaseUrl()
+	baseURL, err := getBaseURL()
 
 	if err != nil {
 		fmt.Printf("Getting base URL failed: %s\n", err)
@@ -48,7 +49,7 @@ func main() {
 	for _, t := range tests {
 		fmt.Printf("Running: %s\n", t.Description())
 
-		if err := t.Run(baseUrl); err != nil {
+		if err := t.Run(baseURL); err != nil {
 			fmt.Printf("> Test failed!\n")
 			fmt.Printf("> %s\n", err)
 			os.Exit(1)
@@ -61,7 +62,7 @@ func main() {
 	fmt.Println("All tests passed.")
 }
 
-func getBaseUrl() (string, error) {
+func getBaseURL() (string, error) {
 	domain := os.Getenv("DOMAIN")
 
 	if domain == "" {
@@ -71,14 +72,14 @@ func getBaseUrl() (string, error) {
 	return fmt.Sprintf("https://%s", domain), nil
 }
 
-func makeRequest(baseUrl string, path string) (*http.Response, error) {
+func makeRequest(baseURL string, path string) (*http.Response, error) {
 	clientWithNoRedirectFollowing := http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
 	}
 
-	req, err := http.NewRequest(http.MethodGet, baseUrl+path, nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, baseURL+path, nil)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)

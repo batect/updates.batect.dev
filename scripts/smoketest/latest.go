@@ -31,8 +31,8 @@ func (t *latestTest) Description() string {
 	return "check /v1/latest"
 }
 
-func (t *latestTest) Run(baseUrl string) error {
-	resp, err := makeRequest(baseUrl, "/v1/latest")
+func (t *latestTest) Run(baseURL string) error {
+	resp, err := makeRequest(baseURL, "/v1/latest")
 
 	if err != nil {
 		return err
@@ -51,12 +51,13 @@ func (t *latestTest) Run(baseUrl string) error {
 		return fmt.Errorf("could not decode JSON response: %w", err)
 	}
 
-	url, hasUrl := decodedBody["url"]
+	url, hasURL := decodedBody["url"]
 
-	if !hasUrl {
+	if !hasURL {
 		return fmt.Errorf("response body is missing URL: %v", decodedBody)
 	}
 
+	//nolint:forcetypeassert
 	if !strings.HasPrefix(url.(string), "https://github.com/batect/batect/releases/tag/") {
 		return fmt.Errorf("response body has unexpected value for URL: %s", url)
 	}

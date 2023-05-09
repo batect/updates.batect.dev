@@ -11,7 +11,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/unrolled/secure v1.13.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.41.1
-	google.golang.org/api v0.121.0
+	google.golang.org/api v0.122.0
 )
 
 require (

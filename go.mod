@@ -7,7 +7,7 @@ require (
 	github.com/batect/services-common v0.71.0
 	github.com/google/uuid v1.3.0
 	github.com/onsi/ginkgo/v2 v2.10.0
-	github.com/onsi/gomega v1.27.7
+	github.com/onsi/gomega v1.27.8
 	github.com/sirupsen/logrus v1.9.3
 	github.com/unrolled/secure v1.13.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.42.0
